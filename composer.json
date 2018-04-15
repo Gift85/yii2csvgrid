@@ -1,0 +1,21 @@
+{
+    "name": "Gift85/csvGrid",
+    "description": "csv grid module for Yii2",
+    "type": "yii2-extension",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Andrew Pikulk",
+            "email": "gift1985@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.6",
+        "yiisoft/yii2": ">=2.0.8",
+    },
+    "autoload": {
+        "psr-4": {
+            "Gift85\\csvGrid\\": ""
+        }
+    }
+}
