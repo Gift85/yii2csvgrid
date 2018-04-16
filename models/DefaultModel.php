@@ -1,6 +1,6 @@
 <?php
 
-namespace Gift85\csvGrid\models;
+namespace CsvGrid\models;
 
 use yii\data\ArrayDataProvider;
 

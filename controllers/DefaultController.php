@@ -1,6 +1,6 @@
 <?php
 
-namespace Gift85\csvGrid\controllers;
+namespace CsvGrid\controllers;
 
 use yii\web\Controller;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Gift85\csvGrid;
+namespace CsvGrid;
 
 /**
  * modules module definition class
@@ -10,7 +10,7 @@ class Module extends \yii\base\module
     /**
      * @inheritdoc
      */
-    public $controllerNamespace = 'Gift85\csvGrid\controllers';
+    public $controllerNamespace = 'CsvGrid\controllers';
 
-    public $controllerModel = 'Gift85\\csvGrid\models\DefaultModel';
+    public $controllerModel = 'CsvGrid\models\DefaultModel';
 }
