@@ -2,9 +2,10 @@
 
 namespace CsvGrid\models;
 
-use yii\data\ArrayDataProvider;
+use \yii\base\Model;
+use \yii\data\ArrayDataProvider;
 
-class DefaultModel
+class DefaultModel extends Model
 {
     public $filename;
     protected $data;
@@ -13,21 +14,17 @@ class DefaultModel
     /** @var \SplFileObject */
     protected $fileObject;
 
-    public function prepare()
+    public function loadCsv()
     {
-        $this->filename = \Yii::$app->cache->get('csvFileName');
-
-        if (!$this->filename || !file_exists($this->filename)) {
-            $this->filename = \Yii::$app->request->getQueryParam('file', '');
+        $this->filename = \Yii::$app->request->getQueryParam('file', null) ?? \Yii::$app->cache->get('csvFileName');
+        if (file_exists($this->filename)) {
             \Yii::$app->cache->set('csvFileName', $this->filename);
+        } else {
+            throw new \Exception('no file no deal');
         }
 
         $this->fileObject = new \SplFileObject($this->filename);
         $this->parseCsv();
-        return [
-            'dataProvider' => $this->getProvider(),
-            'columns' =>  $this->getColumns()
-        ];
     }
 
     protected function parseCsv()
@@ -38,7 +35,6 @@ class DefaultModel
 
         while ($this->fileObject->valid()) {
             $fkey = $this->fileObject->key();
-            $models[$fkey]['id'] = $fkey;
             $row = $this->fileObject->fgetcsv();
 
             foreach ($row as $key => $field) {
@@ -51,76 +47,48 @@ class DefaultModel
         $this->data = $models;
     }
 
-    protected function filter($row)
-    {
-        $filter = \Yii::$app->request->getQueryParam('search', '');
-        if (strlen($filter) > 0) {
-            $hasMatch = false;
-//            var_dump(count($row));
-            foreach ($row as $item) {
-                if (mb_stripos($item, $filter) !== false) {
-
-//                    var_dump($row['id']);
-                    $hasMatch = true;
-                    break;
-                }
-            }
-            return $hasMatch;
-        } else {
-            return true;
-        }
-    }
-
-    protected function getProvider()
-    {
-        return new ArrayDataProvider([
-            'key' => 'id',
-            'allModels' =>  array_filter($this->data, [self::class, 'filter']),
-            'sort' => [
-                'attributes' => array_merge(['id'], $this->header)
-            ],
-        ]);
-    }
-
-    protected function getColumns()
+    public function getColumns()
     {
         $columns = [
-                [
-                    'class' => 'yii\grid\ActionColumn',
-                    'template'=>'{update}{delete}',
-//                    'urlCreator' => function($action, $model, $key, $index) {
-//                        return ;
-//                    },
-//                    'buttons' => [
-//                        'update' => function ($url, $model, $key) {
-//                            return true;
-//                        },
-//                        'delete' => function ($url, $model, $key) {
-//                            return \yii\helpers\Html::a('', [$this->delete, 'param' => $model->id]);
-//                        }
-//                    ]
-                ],
-                ['class' => 'yii\grid\SerialColumn'],
-                'id',
-            ];
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{update}{delete}',
+                'header' => 'Действия',
+            ],
+            ['class' => 'yii\grid\SerialColumn'],
+        ];
 
-        foreach($this->header as $field) [
+        foreach ($this->header as $field) [
             $columns[] = [
                 'attribute' => $field,
-                'value' => $field,
+                'label' => $field,
             ]
         ];
+
         return $columns;
+    }
+
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    public function setDataRow($id, $row)
+    {
+        $this->loadCsv();
+        $this->data[$id] = $row;
     }
 
     public function delete($id)
     {
+        $this->loadCsv();
         unset($this->data[$id]);
     }
 
     public function commit()
     {
-        $temp = implode(',',$this->header) . PHP_EOL;
+        $temp = implode(',', $this->header) . PHP_EOL;
+
         foreach ($this->data as $row) {
             $temp .= implode(',', $row) . PHP_EOL;
         }

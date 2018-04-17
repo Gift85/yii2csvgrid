@@ -12,5 +12,4 @@ class Module extends \yii\base\module
      */
     public $controllerNamespace = 'CsvGrid\controllers';
 
-    public $controllerModel = 'CsvGrid\models\DefaultModel';
 }
