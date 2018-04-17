@@ -19,3 +19,4 @@ composer require gift85/csv-grid
 
 - поиск только примерно так http://localhost.loc/index.php?r=csvGrid%2Fdefault%2Findex&search=79520
 - файл лежит рядом с index.php, косяки с путями не принимались к вниманию ни с какой стороны 
+- с большим файлом идем курить, скорее всего с таймаутом
